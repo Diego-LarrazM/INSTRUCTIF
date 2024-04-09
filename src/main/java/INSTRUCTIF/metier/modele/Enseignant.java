@@ -13,7 +13,9 @@ import javax.persistence.Entity;
  */
 @Entity
 public class Enseignant extends Intervenant {
-    private String typeEts;
+    
+    // le type d'établissement où il enseigne: université, lycée, école,...
+    private String typeEts; 
 
     public Enseignant() {
     }
