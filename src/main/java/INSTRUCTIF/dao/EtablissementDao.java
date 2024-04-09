@@ -16,6 +16,10 @@ import javax.persistence.TypedQuery;
  */
 public class EtablissementDao {
     public void create(Etablissement etablissement){
+        /**
+        * Persiste etablissement dans la base de données selon un contexte de persistance.
+        * @param etablissement :  Un Etablissement à persister dans la table.
+        */
         JpaUtil.obtenirContextePersistance().persist(etablissement);
     }
     public Etablissement findByUai(String uai){
