@@ -37,7 +37,7 @@ public class Eleve implements Serializable {
     @Column(nullable = false)
     private String prenom;
     @Column(nullable = false)
-    private Long niveau;
+    private Long niveau; // la classe de l'élève 6ème : 6, ... Terminale : 0 
     @Temporal(TemporalType.DATE)
     private Date dateDeNaissance;
     @Column(nullable = false, unique = true)
@@ -145,6 +145,10 @@ public class Eleve implements Serializable {
     }
     
     public String getClasse(){
+        /**
+        * Renvoie la classe de l'élève sous forme textuelle.
+        * @return(String) La classe de l'élève de 6ème à Terminale.
+        */
         String clss = null;
         switch(niveau.intValue()){
             case 6: clss = "6ème"; break;
@@ -159,6 +163,10 @@ public class Eleve implements Serializable {
     }
     
     public Soutien dernierSoutien(){
+        /**
+        * Renvoie le dernier soutien de l'elève, que ce soit fini ou en cours.
+        * @return(Soutien) le dernier soutien de l'Eleve.
+        */
         return soutiens.get(soutiens.size() -1);
     }
     
