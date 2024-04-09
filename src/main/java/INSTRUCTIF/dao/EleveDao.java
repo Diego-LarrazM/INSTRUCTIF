@@ -24,7 +24,7 @@ public class EleveDao {
     }
     public void update(Eleve eleve){
         /**
-        * Met à jour les données associées à l'entitée eleve dans la base de données selon un contexte de persistance.
+        * Met à jour les données associées à l'entitée <eleve> dans la base de données selon un contexte de persistance.
         * @param(Eleve) <eleve> : Un Eleve dont ses informations sont à mettre dans la base de données.
         */
         JpaUtil.obtenirContextePersistance().merge(eleve);
