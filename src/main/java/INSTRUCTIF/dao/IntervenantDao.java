@@ -18,11 +18,19 @@ import javax.persistence.TypedQuery;
 public class IntervenantDao {
 
     public void create(Intervenant intervenant){
+        /**
+        * Persiste <intervenant> dans la base de données selon un contexte de persistance.
+        * @param(Intervenant) <intervenant> : Un Intervenant à persister dans la base de données.
+        */
         JpaUtil.obtenirContextePersistance().persist(intervenant);
     }
     
     
     public void update(Intervenant intervenant){
+        /**
+        * Met à jour les données associées à l'entitée <intervenant> dans la base de données selon un contexte de persistance.
+        * @param(Intervenant) <intervenant> : Un Eleve dont ses informations sont à mettre dans la base de données.
+        */
         JpaUtil.obtenirContextePersistance().merge(intervenant);
     }
     
