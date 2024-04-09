@@ -29,11 +29,18 @@ import javax.persistence.TemporalType;
 
 @Entity
 public class Soutien implements Serializable {
-    
+
+    // Cette enum permet d'évaluer les soutiens
     public enum Evaluation {
         PAS_EVALUE, PAS_COMPRIS, ENCORE_DU_MAL, MOYEN_COMPRIS, ACQUIS_ENSSENTIEL, TOUT_COMPRIS;
     
         public static Evaluation FromInt(int eval){
+            /**
+            * Transforme un entier en Evaluation selon l'ordre de l'enum:
+            * PAS_EVALUE: 0, PAS_COMPRIS: 1, ... TOUT_COMPRIS: 5.
+            * @param(int) <eval> : l'évaluation de l'élève d'un soutien sous forme entière.
+            * @return(Evaluation) L'Evaluation correspondante à la valeur d'entier <eval>.
+            */
             return Evaluation.values()[eval];
         }
     };
@@ -45,14 +52,14 @@ public class Soutien implements Serializable {
     @Column(nullable = false)
     private String descriptif;
     @Temporal(TemporalType.DATE)
-    private Date dateDemande;
+    private Date dateDemande; // la date de la réalisation de la demande
     @Temporal(TemporalType.DATE)
-    private Date dateDebut;
+    private Date dateDebut; // la date du début de la visio-conférence
     @Temporal(TemporalType.TIME)
     private Date duree;
     @Enumerated(EnumType.ORDINAL)
     private Evaluation evalEleve = Evaluation.PAS_EVALUE;
-    private String BilanInter;
+    private String BilanInter; // le bilan du soutien écrit par l'intervenant
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Eleve eleve;
@@ -99,6 +106,10 @@ public class Soutien implements Serializable {
     }
 
     public Long getDuree() {
+        /**
+        * Renvoie en milliseconds la durée du soutien.
+        * @return(Long) <res> : La duréé du soutien en ms. Null si il n'a pas commencé/refusé
+        */
         Long res = null;
         if(duree != null){
             res = duree.getTime();
