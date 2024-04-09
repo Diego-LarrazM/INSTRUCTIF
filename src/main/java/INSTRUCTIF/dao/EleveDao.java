@@ -11,10 +11,15 @@ import javax.persistence.TypedQuery;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 public class EleveDao {
+    
     public void create(Eleve eleve){
+        /**
+        * Persiste eleve dans la base de données selon un contexte de persistance.
+        * @param eleve :  Un Eleve à persister dans la table.
+        */
         JpaUtil.obtenirContextePersistance().persist(eleve);
     }
     public void update(Eleve eleve){
