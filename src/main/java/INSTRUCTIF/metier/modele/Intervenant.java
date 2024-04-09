@@ -39,7 +39,9 @@ public abstract class Intervenant implements Serializable {
     @Column(nullable = false)
     private String motDePasse;
     @Column(nullable = false)
-    private Boolean disponible;
+    private Boolean disponible; // indique s'il peut prendre des soutiens (true) ou s'il est occupé (false)
+
+    // Cet intervenant n'enseigne que des calsses de niveau niveauMin à niveauMax.  niveauMin >= 6 et niveauMax <= 0.
     @Column(nullable = false)
     private Integer niveauMin;
     @Column(nullable = false)
@@ -54,8 +56,9 @@ public abstract class Intervenant implements Serializable {
     
     public void addSoutien(Soutien soutien){
         this.soutiens.add(soutien);
-        if(soutien.getIntervenant() != this){
-            soutien.setIntervenant(this);
+        // si l'intervenant ne'est pas attribué à ce soutien alors qu'il le prends en charge
+        if(soutien.getIntervenant() != this){ 
+            soutien.setIntervenant(this); // l'attribuer
         }
     }
 
