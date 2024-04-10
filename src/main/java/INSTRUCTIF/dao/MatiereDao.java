@@ -11,7 +11,7 @@ import javax.persistence.TypedQuery;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 public class MatiereDao {
     public void create(Matiere matiere){
