@@ -43,8 +43,8 @@ public class Service {
     public Eleve obtenirEleveParId(Long id) {
         /**
         * Renvoie l'élève identifié par <id>.
-        * @param(Long) <id> : l'id de l'Eleve cherché.
-        * @return(Eleve) <res> : L'Elève idéntifié par son id. Null s'il n'existe pas.
+        * @param(Long) <id> : l'id de l’élève cherché.
+        * @return(Eleve) <res> : l’élève identifié par son id. Null s'il n'existe pas.
         */
         Eleve res = null;
         try{   
@@ -61,7 +61,7 @@ public class Service {
     public List<Eleve> obtenirEleves(){
         /**
         * Renvoie la liste de tous les élèves inscrits sur INSTRUCT'IF.
-        * @return(List<Eleve>) <eleves> : Une ArrayList d'Eleve inscrits sur la base de données. Null si aucun existe.
+        * @return(List<Eleve>) <eleves> : Une ArrayList d’élève inscrits sur la base de données. Null si aucun existe.
         */
         List<Eleve> eleves = new ArrayList();
         try{
@@ -77,9 +77,9 @@ public class Service {
     
     public Etablissement obtenirEtablissementParId(Long id){
         /**
-        * Renvoie l'établissemenet identifié par <id>.
-        * @param(Long) <id> : l'id de l'Etablissement cherché.
-        * @return(Etablissement) <res> : L'Etablissement idéntifié par son id. Null s'il n'existe pas.
+        * Renvoie l’établissement identifié par <id>.
+        * @param(Long) <id> : l'id de l’établissement cherché.
+        * @return(Etablissement) <res> : l’établissement identifié par son id. Null s'il n'existe pas.
         */
         Etablissement res = null;
         try{   
@@ -97,7 +97,7 @@ public class Service {
     public List<Etablissement> obtenirEtablissements(){
         /**
         * Renvoie la liste de tous les établissements d'élèves inscrits sur INSTRUCT'IF.
-        * @return(List<Etablissement>) <etablissements> : Une ArrayList d'Etablissement inscrits sur la base de données. Null si aucun existe.
+        * @return(List<Etablissement>) <etablissements> : Une ArrayList d’établissement inscrits sur la base de données. Null si aucun existe.
         */
         List<Etablissement> etablissements = new ArrayList();
         try{
@@ -115,7 +115,7 @@ public class Service {
         /**
         * Renvoie l'intervenant identifié par <id>.
         * @param(Long) <id> : l'id de l'Intervenant cherché.
-        * @return(Intervenant) <res> : L'Intervenant idéntifié par son id. Null s'il n'existe pas.
+        * @return(Intervenant) <res> : L'Intervenant identifié par son id. Null s'il n'existe pas.
         */
         Intervenant res = null;
         try{   
@@ -152,8 +152,8 @@ public class Service {
     public Matiere obtenirMatiereParId(Long id) {
         /**
         * Renvoie la matière identifiée par <id>.
-        * @param(Long) <id> : l'id de la Matiere cherchée.
-        * @return(Matiere) <res> : La Matiere idéntifiée par son id. Null si elle n'existe pas.
+        * @param(Long) <id> : l'id de la Matière cherchée.
+        * @return(Matiere) <res> : La Matière identifiée par son id. Null si elle n'existe pas.
         */
         Matiere res = null;
         try{   
@@ -190,7 +190,7 @@ public class Service {
         /**
         * Renvoie le soutien identifié par <id>.
         * @param(Long) <id> : l'id du Soutien cherché.
-        * @return(Soutien) <res> : Le Soutien idéntifié par son id. Null s'il n'existe pas.
+        * @return(Soutien) <res> : Le Soutien identifié par son id. Null s'il n'existe pas.
         */
         Soutien res = null;
         try{   
@@ -211,7 +211,7 @@ public class Service {
         */
         List<Soutien> soutiens = new ArrayList();
         try{
-            JpaUtil.creerContextePersistance()
+            JpaUtil.creerContextePersistance();
             soutiens = sDao.findAll(); // obtention de tous les soutiens
         }catch(Exception e){
             System.err.println(e);
@@ -229,7 +229,7 @@ public class Service {
         * La RepartitionGeographique correspond à l'id, coordonnées (lat,lng) et nombre d'élèves dans INSTRUCT'IF de chaque établissement de la base de données. 
         * Les informations de chaque établissement sont stockées sous forme d'un objet EtabHitInstance(idEtablissement, lat, lng, nbElevesInstructifAssociés).
         * Liste ordonnée par nombre d'élèves pour un établissement.
-        * @return(Statistiques) <stats> : Les statistiquesà afficher sur la fenêtre du tableau de bord. Null si un erreur s'est produit lors de l'obtention d'une statistique.
+        * @return(Statistiques) <stats> : Les statistiques à afficher sur la fenêtre du tableau de bord. Null si un erreur s'est produit lors de l'obtention d'une statistique.
         */
         Statistiques  stats = new Statistiques();
         try{
@@ -252,7 +252,7 @@ public class Service {
     
     private Intervenant trouverIntervenant(Long niveau) {
         /**
-        * Choisi un intervenant parmis les disponibles, pour répondre à un soutien réalisé par un élève en classe <niveau>.
+        * Choisi un intervenant parmi les disponibles, pour répondre à un soutien réalisé par un élève en classe <niveau>.
         * Un intervenant est disponible si il n'est pas déjà occupé d'un autre soutien (Intervenant.disponible est vrai).
         * De même il faut que son niveau d'enseignement convient au niveau de la demande de soutien <niveau>: 
         * Intervenant peut enseigner des classes de niveauMin à niveauMax, il faut que <niveau> ∈ [niveauMin, niveauMax] pour qu'il soit choisi.
@@ -267,7 +267,7 @@ public class Service {
     public Boolean demanderSoutien(Eleve eleve, Soutien soutien){
         /**
         * Réalise la demande d'un soutien crée par un élève.
-        * La methode met à jour la date de demande du soutien, attribue le soutien à l'élève et tente de l'attribuer à un intervenant.
+        * La méthode met à jour la date de demande du soutien, attribue le soutien à l'élève et tente de l'attribuer à un intervenant.
         * Dans le cas où aucun intervenant soit trouvé celle-ci est considérée comme refusée.
         * Le soutien, l'élève et l'intervenant éventuellement sont mis à jour dans la base de données.
         * |!|ATTENTION|!| : La demande est réalisée en mode sérialisé pour éviter des concurrences: même intervenant pour deux soutiens par exemple. 
@@ -277,7 +277,7 @@ public class Service {
         * @return(Boolean) <res> : Faux si un erreur s'est produite ou si la demande a été refusée. Vrai sinon
         */
         boolean res = false;
-        lockSoutien.tryLock(); // Blocakge de la methode pour le traitement en série des deémandes
+        lockSoutien.tryLock(); // Blockage de la méthode pour le traitement en série des demandes
         try{   
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
@@ -298,14 +298,14 @@ public class Service {
         }finally{
             JpaUtil.fermerContextePersistance();
         }
-        lockSoutien.unlock(); // Traitement fini, déblockage.
+        lockSoutien.unlock(); // Traitement fini, déblocage.
         return res;
     }
     
     private Boolean traiterSoutien(Soutien soutien) {
         /**
         * Trouve un intervenant pour <soutien> et le refuse en cas d'indisponibilité.
-        * Un soutien est refusé si sa durée est égale à 0. En attente si sa durée est null (non definie).
+        * Un soutien est refusé si sa durée est égale à 0. En attente si sa durée est null (non définie).
         * @param(Soutien) <soutien> : Un Soutien demande à traiter.
         * @return(Boolean) <res> : Faux si un erreur s'est produite ou si la demande a été refusée. Vrai sinon
         */
@@ -343,14 +343,14 @@ public class Service {
     public boolean demarrerVisio(Soutien soutien) {
         /**
         * Met à jour les informations nécessaires pour le lancement de la visio-conférence.
-        * Plus précisement, il met à jour la date de début de la visio-conférence.
+        * Plus précisément, il met à jour la date de début de la visio-conférence.
         * @param(Soutien) <soutien> : Un Soutien demande.
         * @precondition(Soutien) <soutien> n'est pas refusé et est attribué à un intervenant.
         * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
         */
         boolean res = false;
         try{  
-            System.out.println("[LOG] Demarrage de la visio-conference");
+            System.out.println("[LOG] Démarrage de la visio-conference");
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
             // Mise à jour de la date de début de la visio-conférence à l'actuelle.
@@ -370,7 +370,7 @@ public class Service {
         /**
         * Affecte à soutien <soutien>  le bilan <bilan>  rédigé par l'intervenant qui est intervenu au soutien.
         * @param(Soutien) <soutien> : Le Soutien demande.
-        * @param(String) <bilan> : Le bilan du soutien <sotuien> pour l'élève, écrit par l'intervenant.
+        * @param(String) <bilan> : Le bilan du soutien <soutien> pour l'élève, écrit par l'intervenant.
         * @precondition(<soutien>) <soutien> est fini (visio-conférence réalisée) <=> durée > 0.
         * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
         */
@@ -403,7 +403,7 @@ public class Service {
         try{  
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-            // Affcetation de l'évaluation et mise à jour de la BD
+            // Affectation de l'évaluation et mise à jour de la BD
             soutien.setEvalEleve(eval);
             sDao.update(soutien);
             JpaUtil.validerTransaction();
@@ -432,10 +432,11 @@ public class Service {
             // Affecte la durée du soutien ( date actuelle - date de debut de la visio)
             soutien.setDuree(new Date(new Date().getTime() - soutien.getDateDebut().getTime()));
             soutien.getIntervenant().setDisponible(true);
+            // Mise à jour dans la base de données
             iDao.update(soutien.getIntervenant());
             sDao.update(soutien);
-            res = true;
             JpaUtil.validerTransaction();
+            res = true;
         }
         catch(Exception e){
             System.err.println(e);
@@ -487,13 +488,20 @@ public class Service {
     }
     
     public Intervenant authentifierIntervenant(String mail, String motDePasse) {
-        Intervenant res = null;
+        /**
+         * Essaye d’authentifier un intervenant avec son <mail> et son <motDePasse>.
+         * @param(String) <mail> : l'email d'un Intervenant.
+         * @param(String) <motDePasse> : l mot de passe avec lequel on tente dde s'authentifier.
+         * @return(Intervenant) <intervenant> : L'intervenant si ses identifiants sont corrects, null sinon.
+         */
+        Intervenant intervenant = null;
         try{
             JpaUtil.creerContextePersistance();
-
-            res = iDao.findByMail(mail);
-            if(!res.getMotDePasse().equals(motDePasse)){
-                res = null;
+            // Recherche de l'entité Intervenant par son mail.
+            intervenant = iDao.findByMail(mail);
+            // Si un Intervenant identifié par <mail> existe (non null), tester que le mot de passe soit correcte.
+            if(intervenant != null && !intervenant.getMotDePasse().equals(motDePasse)){
+                intervenant = null;
             }
         }
         catch(Exception e){
@@ -501,42 +509,48 @@ public class Service {
         }finally{
             JpaUtil.fermerContextePersistance();
         }
-        return res;
+        return intervenant;
     }
     
     public Boolean inscrireEleve(Eleve eleve, String uai) {
+        /**
+        * Inscrit dans la base de données un un Eleve <eleve> appartenant à un établissement identifié par son <uai>.
+        * @param(Eleve) <eleve> : Un élève à inscrire.
+        * @param(String) <uai> : Le code uai d'un établissement dans l'API EducNET.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
+        */
         boolean res = false;
         try{
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-            
+            // Tente de récupérer son établissement dans notre base de donnée, sinon tente de l'ajouter.
             Etablissement etab = etsDao.findByUai(uai);
-
-            
-            if(etab == null) {
+            if (etab == null) {
+                // Recherche un college ou lycée avec cet uai.
                 EducNetApi api = new EducNetApi();
-
                 List<String> result = api.getInformationCollege(uai);
                 if (result == null) {
                     result = api.getInformationLycee(uai);
                 }
-                
+                // Si trouvé, l'ajouter à la base de données.
                 if (result != null) {
-                    etab = new Etablissement(uai,result.get(1),result.get(2),result.get(4),result.get(3),result.get(6),result.get(5),result.get(7),Double.parseDouble(result.get(8)));
+                    etab = new Etablissement(uai, result.get(1), result.get(2), result.get(4), result.get(3),
+                            result.get(6), result.get(5), result.get(7), Double.parseDouble(result.get(8)));
                     inscrireEtablissement(etab);
-                }
-                else {
+                } else {
                     System.out.println("[ERROR] Etablissement inconnu");
                 }
             }
+            
+            // Si l'uai est valide (l'établissement existe).
             if(etab != null) {
-
+                // L'affecter à l’élève et mettre à jour ses informations dans la base de données.
                 eleve.setEtablissement(etab);
                 eDao.create(eleve);
-
                 JpaUtil.validerTransaction();
+                // Envoie du mail de confirmation d'inscription.
                 Message.envoyerMail("contact@instruct.if", eleve.getEmail(), "Bienvenu sur le réseau INSTRUCT'IF", "Bonjour" + eleve.getPrenom() + ", "
-                    + "nous te confirmons ton insciiption au reaseau INSTRUCT'IF.\n"
+                    + "nous te confirmons ton inscription au reseau INSTRUCT'IF.\n"
                     + "Si tu as besoin d'un soutien pour tes leçons ou tes devoirs, rends toi sur notre site pour la mise en relation avec un intervenant.");
                 res = true;
             }
@@ -544,7 +558,8 @@ public class Service {
         }
         catch(Exception e){
             System.err.println(e);
-            Message.envoyerMail("contact@instruct.if", eleve.getEmail(),"Echec de l'inscription sur le réseau INSTRUCT'IF", "Merci de recommencer ultérieurement.");
+            // Envoie du mail de de refus d'inscription.
+            Message.envoyerMail("contact@instruct.if", eleve.getEmail(), "Échec de l'inscription sur le réseau INSTRUCT'IF", "Merci de recommencer ultérieurement.");
         }finally{
             JpaUtil.fermerContextePersistance();
         }
@@ -552,13 +567,20 @@ public class Service {
     }
     
     public Eleve authentifierEleve(String mail, String motDePasse) {
-        Eleve res = null;
+        /**
+         * Essaye d’authentifier un élève avec son <mail> et son <motDePasse>.
+         * @param(String) <mail> : l'email d'un Eleve.
+         * @param(String) <motDePasse> : le mot de passe avec lequel on tente de s'authentifier.
+         * @return(Eleve) <eleve> : L'élève authentifié si ses identifiants sont corrects, null sinon.
+         */
+        Eleve eleve = null;
         try{
             JpaUtil.creerContextePersistance();
-
-            res = eDao.findByMail(mail);
-            if(!res.getMotDePasse().equals(motDePasse)){
-                res = null;
+            // Recherche de l'entité Eleve par son mail.
+            eleve = eDao.findByMail(mail);
+            // Si un Eleve identifié par <mail> existe, tester que le mot de passe soit correcte.
+            if(eleve != null && !eleve.getMotDePasse().equals(motDePasse)){
+                eleve = null;
             }
         }
         catch(Exception e){
@@ -566,22 +588,7 @@ public class Service {
         }finally{
             JpaUtil.fermerContextePersistance();
         }
-        return res;
-    }
-    
-    public List<Eleve> obtenirNbIntervenant() {
-        List<Eleve> res = null;
-        try{
-            JpaUtil.creerContextePersistance();
-            res = eDao.findAllAsc();
-        }
-        catch(Exception e){
-            System.err.println(e);
-        }finally{
-            JpaUtil.fermerContextePersistance();
-        }
-        return res;
-        
+        return eleve;
     }
     
     public boolean insererMatieres() {
@@ -594,8 +601,8 @@ public class Service {
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
 
-            mDao.create(new Matiere("Histoire-Geographie"));
-            mDao.create(new Matiere("Mathematiques"));
+            // Creation des matières dans la base de données.            mDao.create(new Matiere("Histoire-Géographie"));
+           mDao.create(new Matiere("Mathématiques"));
             mDao.create(new Matiere("Français"));
             mDao.create(new Matiere("Anglais"));
             mDao.create(new Matiere("Physique - Chimie"));

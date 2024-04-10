@@ -95,7 +95,7 @@ public class Scenarios {
                     System.out.println("Soutien n°" + i + ": "+ soutiens[i]);
                     
                     if(i == 0 || i == 3){
-                        Serv.demarerVisio(soutiens[i]);
+                        Serv.demarrerVisio(soutiens[i]);
                         Serv.arreterVisio(soutiens[i]);
                     }
                     afficherIntervs();
@@ -267,7 +267,7 @@ public class Scenarios {
     
     private static boolean VisioConference(Soutien s, boolean eleveView) {
         System.out.println("\n[PHASE] Demarrage du soutien de " + s.getMatiere().getLibelle() + " avec " + s.getEleve().getPrenom() + " et " + s.getIntervenant().getPrenom());
-        boolean res = Serv.demarerVisio(s);
+        boolean res = Serv.demarrerVisio(s);
         if(res) {
            System.out.println("[RESULT] Lancement de la visio-conférence réussie");
            if(eleveView){
