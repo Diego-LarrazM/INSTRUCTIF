@@ -252,11 +252,12 @@ public class Service {
     
     private Intervenant trouverIntervenant(Long niveau) {
         /**
-        * Choisi un intervenant parmis les disponibles, pour répondre à un soutien réalisé par un élève en classe <niveau> (6e à Terminale).
+        * Choisi un intervenant parmis les disponibles, pour répondre à un soutien réalisé par un élève en classe <niveau>.
         * Un intervenant est disponible si il n'est pas déjà occupé d'un autre soutien (Intervenant.disponible est vrai).
         * De même il faut que son niveau d'enseignement convient au niveau de la demande de soutien <niveau>: 
         * Intervenant peut enseigner des classes de niveauMin à niveauMax, il faut que <niveau> ∈ [niveauMin, niveauMax] pour qu'il soit choisi.
         * @param(Long) <niveau> : Le niveau (classe) de l'élève qui démande le soutien.
+        * @precondition(niveau) <niveau> ∈ [0, 6] avec 6: classe de 6ème et 0: classe de Terminale.
         * @return(Intervenant) L'intervenant choisi pour répondre au soutien. Null si aucun disponible.
         */
         List<Intervenant> choices = iDao.findAvailableOrdered(niveau);
@@ -265,31 +266,30 @@ public class Service {
 
     public Boolean demanderSoutien(Eleve eleve, Soutien soutien){
         /**
-        * Réalise la demande d'un soutien crée par un élève.
+        * Réalise la démande d'un soutien crée par un élève.
         * La methode met à jour la date de demande du soutien, attribue le soutien à l'élève et tente de l'attribuer à un intervenant.
         * Dans le cas où aucun intervenant soit trouvé celle-ci est considérée comme refusée.
         * Le soutien, l'élève et l'intervenant éventuellement sont mis à jour dans la base de données.
-        * /!/ATTENTION/!/ : La démande est réalisée en mode sérialisé pour éviter des concurrences: même intervenant pour deux soutiens par exemple. 
-        * Le démandes sont traitées par ordre d'arrivée : la première demande (celle qui arrive le plus tôt) sera traitée, puis la deuxième.
-        * @param(Long) <niveau> : Le niveau (classe) de l'élève qui démande le soutien.
-        * @return(Intervenant) L'intervenant choisi pour répondre au soutien. Null si aucun disponible.
+        * |!|ATTENTION|!| : La démande est réalisée en mode sérialisé pour éviter des concurrences: même intervenant pour deux soutiens par exemple. 
+        * Les démandes sont traitées par ordre d'arrivée : la première demande (celle qui arrive le plus tôt) sera traitée, puis la deuxième.
+        * @param(Eleve) <eleve> : L'élève qui démande le soutien.
+        * @param(Soutien) <soutien> : Le Soutien démandé à traiter.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux. |-|REMARQUE|-| Il n'indique pas si la demande a été refusée ou pas.
         */
-        lockSoutien.tryLock();
         boolean res = false;
+        lockSoutien.tryLock(); // Blocakge de la methode pour le traitement en série des deémandes
         try{   
-            
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-            
+            // Affecter au soutien sa date de demande à l'actuelle
             soutien.setDateDemande(new Date());
+            // Attribuer le soutien à l'élève <eleve>
             eleve.addSoutien(soutien);
-            
+            // Persistance du soutien et mise à jour des informations dans la base de données
             sDao.create(soutien);
-            eDao.update(eleve);
-            
-            traiterSoutien(soutien);
-            
-            
+            eDao.update(eleve);   
+            // Trouver l'intervenant et envoyer le message correspondant ou refuser la démande
+            traiterSoutien(soutien); 
             JpaUtil.validerTransaction();
             res = true;
         }
@@ -298,50 +298,62 @@ public class Service {
         }finally{
             JpaUtil.fermerContextePersistance();
         }
-        lockSoutien.unlock();
+        lockSoutien.unlock(); // Traitement fini, déblockage.
         return res;
     }
     
     private void traiterSoutien(Soutien soutien) {
+        /**
+        * Trouve un intervenant pour <soutien> et le refuse en cas d'indisponibilité.
+        * Un soutien est refusé si sa durée est égale à 0. En attente si sa durée est null (non definie).
+        * @param(Soutien) <soutien> : Un Soutien démandé à traiter.
+        */
         try{   
+            // Recherche d'un intervenant disponible à qui affecter <soutien>.
             Eleve eleve = soutien.getEleve();
             Intervenant inter = trouverIntervenant(eleve.getNiveau());
-
+            // Si un intervenant trouvé
             if (inter != null) {
-                DateFormat dateFormatter = new SimpleDateFormat("HH:mm");
+                // Attribuer le soutien à l'intervenant
                 inter.addSoutien(soutien);
+                // L'intervenant a été pris, il est ainsi mis indisponible pour d'autres démandes.
                 inter.setDisponible(false);
-
+                // Mise à jour des informations dans la base de données
                 sDao.update(soutien);
                 iDao.update(inter);
-
+                // Envoie du sms à l'intervenant choisi pour l'informer de son intervention en attente.
+                DateFormat dateFormatter = new SimpleDateFormat("HH:mm");
                 Message.envoyerNotification(inter.getTel(), "Bonjour "+ inter.getPrenom() 
                     + ". Merci de prendre en charge la demande de soutien en <<" + soutien.getMatiere().getLibelle()
                     +">> demandée à " + dateFormatter.format(soutien.getDateDemande()) + " par " 
                     + eleve.getPrenom() 
                     + " en calsse de " + eleve.getClasse() + ".");
             } else{
-                soutien.setDuree(new Date(0)); // soutient ave duére nulle -> pas d'intervenant au moment de la demande
+                soutien.setDuree(new Date(0)); // pas d'intervenant au moment de la demande -> refus du soutien
             }
-        }
-        catch(Exception e){
+        }catch(Exception e){
             System.err.println(e);
         }
     }
     
-    public boolean demarerVisio(Soutien soutien) {
-        
+    public boolean demarrerVisio(Soutien soutien) {
+        /**
+        * Met à jour les informations nécessaires pour le lancement de la visio-conférence.
+        * Plus précisement, il met à jour la date de début de la visio-conférence.
+        * @param(Soutien) <soutien> : Un Soutien démandé.
+        * @precondition(Soutien) <soutien> n'est pas refusé et est attribué à un intervenant.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
+        */
         boolean res = false;
         try{  
             System.out.println("[LOG] Demarrage de la visio-conference");
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-            
+            // Mise à jour de la date de début de la visio-conférence à l'actuelle.
             soutien.setDateDebut(new Date());
             sDao.update(soutien);
-            res = true;
-            
             JpaUtil.validerTransaction();
+            res = true;
         }catch(Exception e){
             System.err.println(e);
         }finally{
@@ -351,16 +363,22 @@ public class Service {
     }
     
     public boolean redigerBilan(Soutien soutien, String bilan){
+        /**
+        * Affecte à soutien <soutien>  le bilan <bilan>  rédigé par l'intervenant qui est intervenu au soutien.
+        * @param(Soutien) <soutien> : Le Soutien démandé.
+        * @param(String) <bilan> : Le bilan du soutien <sotuien> pour l'élève, écrit par l'intervenant.
+        * @precondition(<soutien>) <soutien> est fini (visio-conférence réalisée) <=> durée > 0.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
+        */
         boolean res = false;
         try{  
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-            
+            // Écriture du bilan dans <soutien> et mise à jour dans la BD.
             soutien.setBilanInter(bilan);
             sDao.update(soutien);
-            res = true;
-            
             JpaUtil.validerTransaction();
+            res = true;
         }catch(Exception e){
             System.err.println(e);
         }finally{
@@ -370,16 +388,22 @@ public class Service {
     }
     
     public boolean affecterUneEvaluation(Soutien soutien, Soutien.Evaluation eval){
+        /**
+        * Affecte à <soutien> l'évaluation <eval> de l'élève qui a demandé le soutien.
+        * @param(Soutien) <soutien> : Le Soutien démandé.
+        * @param(Soutien.Evaluation) <eval> : L'évaluation du soutien par l'élève.
+        * @precondition(<soutien>) <soutien> est fini (visio-conférence réalisée) <=> durée > 0.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur.
+        */
         boolean res = false;
         try{  
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-            
+            // Affcetation de l'évaluation et mise à jour de la BD
             soutien.setEvalEleve(eval);
             sDao.update(soutien);
-            res = true;
-            
             JpaUtil.validerTransaction();
+            res = true;
         }catch(Exception e){
             System.err.println(e);
         }finally{
@@ -390,6 +414,12 @@ public class Service {
     }
     
     public boolean arreterVisio(Soutien soutien) {
+        /**
+        * Affecte la durée du soutien à <soutien> et remet l'intervenant qui l'a réalisé comme disponible.
+        * @param(Soutien) <soutien> : Un Soutien démandé.
+        * @precondition(Soutien) <soutien> n'est pas refusé et est attribué à un intervenant.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
+        */
         boolean res = false;
         try{   
             System.out.println("[LOG] Arrêt de la visio-conference");
@@ -401,7 +431,6 @@ public class Service {
             iDao.update(soutien.getIntervenant());
             sDao.update(soutien);
             res = true;
-            
             JpaUtil.validerTransaction();
         }
         catch(Exception e){
