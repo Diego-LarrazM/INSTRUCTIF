@@ -20,7 +20,7 @@ import javax.persistence.OneToMany;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
