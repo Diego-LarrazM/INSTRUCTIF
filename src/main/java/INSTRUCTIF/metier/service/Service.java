@@ -36,7 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 public class Service {
     
