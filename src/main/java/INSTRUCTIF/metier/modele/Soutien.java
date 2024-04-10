@@ -21,7 +21,7 @@ import javax.persistence.TemporalType;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 
 
