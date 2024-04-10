@@ -33,7 +33,7 @@ public class EleveDao {
         /**
         * Cherche dans la base de données l'entitée Eleve dont son email est <email>. Selon un contexte de persistance.
         * @param(String) <email> : l'email de l'Eleve cherché.
-        * @return(Elève) <res> : L'Elève idéntifié par son email. Null s'il n'existe pas.
+        * @return(Eleve) <res> : L'Elève idéntifié par son email. Null s'il n'existe pas.
         */
         TypedQuery<Eleve> query = JpaUtil.obtenirContextePersistance().createQuery("SELECT e from Eleve e WHERE e.email = :email", Eleve.class);
         query.setParameter("email",email);
