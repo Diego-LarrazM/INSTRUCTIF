@@ -49,10 +49,8 @@ public class Service {
         Eleve res = null;
         try{   
             JpaUtil.creerContextePersistance();
-            
-            res = eDao.findById(id);
-        }
-        catch(Exception e){
+            res = eDao.findById(id); // recherche de l'élève par id
+        }catch(Exception e){
             System.err.println(e);
         }finally{
             JpaUtil.fermerContextePersistance();
@@ -61,12 +59,14 @@ public class Service {
     }
     
     public List<Eleve> obtenirEleves(){
+        /**
+        * Renvoie la liste de tous les élèves inscrits sur INSTRUCT'IF.
+        * @return(List<Eleve>) <eleves> : Une ArrayList d'Eleve inscrits sur la base de données. Null si aucun existe.
+        */
         List<Eleve> eleves = new ArrayList();
         try{
             JpaUtil.creerContextePersistance();
-            
-            eleves = eDao.findAll();
-
+            eleves = eDao.findAll(); // obtention de tous les élèves
         }catch(Exception e){
             System.err.println(e);
         }finally{
@@ -76,11 +76,15 @@ public class Service {
     }
     
     public Etablissement obtenirEtablissementParId(Long id ){
+        /**
+        * Renvoie l'établissemenet identifié par <id>.
+        * @param(Long) <id> : l'id de l'Etablissement cherché.
+        * @return(Etablissement) <res> : L'Etablissement idéntifié par son id. Null s'il n'existe pas.
+        */
         Etablissement res = null;
         try{   
             JpaUtil.creerContextePersistance();
-            
-            res = etsDao.findById(id);
+            res = etsDao.findById(id); // recherche de l'établissement par id
         }
         catch(Exception e){
             System.err.println(e);
@@ -91,12 +95,14 @@ public class Service {
     }
     
     public List<Etablissement> obtenirEtablissements(){
+        /**
+        * Renvoie la liste de tous les établissements d'élèves inscrits sur INSTRUCT'IF.
+        * @return(List<Etablissement>) <etablissements> : Une ArrayList d'Etablissement inscrits sur la base de données. Null si aucun existe.
+        */
         List<Etablissement> etablissements = new ArrayList();
         try{
             JpaUtil.creerContextePersistance();
-            
-            etablissements = etsDao.findAll();
-            
+            etablissements = etsDao.findAll(); // obtention de tous les établissements
         }catch(Exception e){
             System.err.println(e);
         }finally{
@@ -106,11 +112,16 @@ public class Service {
     }
     
     public Intervenant obtenirIntervenantParId(Long id ) {
+        /**
+        * Renvoie l'intervenant identifié par <id>.
+        * @param(Long) <id> : l'id de l'Intervenant cherché.
+        * @return(Intervenant) <res> : L'Intervenant idéntifié par son id. Null s'il n'existe pas.
+        */
         Intervenant res = null;
         try{   
             JpaUtil.creerContextePersistance();
             
-            res = iDao.findById(id);
+            res = iDao.findById(id); // recherche de l'intervenant par id
         }
         catch(Exception e){
             System.err.println(e);
@@ -121,11 +132,14 @@ public class Service {
     }
 
     public List<Intervenant> obtenirIntervenants(){
+        /**
+        * Renvoie la liste de tous les intervenants inscrits sur INSTRUCT'IF.
+        * @return(List<Intervenant>) <intervenants> : Une ArrayList d'Intervenant inscrits sur la base de données. Null si aucun existe.
+        */
         List<Intervenant> intervenants = new ArrayList();
         try{
             JpaUtil.creerContextePersistance();
-            
-            intervenants = iDao.findAll();
+            intervenants = iDao.findAll(); // obtention de tous les intervenants
             
         }catch(Exception e){
             System.err.println(e);
@@ -136,11 +150,16 @@ public class Service {
     }
     
     public Matiere obtenirMatiereParId(Long id ) {
+        /**
+        * Renvoie la matière identifiée par <id>.
+        * @param(Long) <id> : l'id de la Matiere cherchée.
+        * @return(Eleve) <res> : La Matiere idéntifiée par son id. Null si elle n'existe pas.
+        */
         Matiere res = null;
         try{   
             JpaUtil.creerContextePersistance();
 
-            res = mDao.findById(id);
+            res = mDao.findById(id); // recherche de la matière par id
         }
         catch(Exception e){
             System.err.println(e);
@@ -151,12 +170,14 @@ public class Service {
     }
 
     public List<Matiere> obtenirMatieres(){
+        /**
+        * Renvoie la liste de toutes les matières disponibles sur INSTRUCT'IF.
+        * @return(List<Matiere>) <res> : Une ArrayList des Matiere inscrites sur la base de données. Null si aucune existe.
+        */
         List<Matiere> matieres = new ArrayList();
         try{
             JpaUtil.creerContextePersistance();
-            
-            matieres = mDao.findAllAsc();
-
+            matieres = mDao.findAllAsc(); // obtention de toutes les matières
         }catch(Exception e){
             System.err.println(e);
         }finally{
@@ -166,13 +187,16 @@ public class Service {
     }
     
     public Soutien obtenirSoutienParId(Long id ) {
+        /**
+        * Renvoie le soutien identifié par <id>.
+        * @param(Long) <id> : l'id du Soutien cherché.
+        * @return(Eleve) <res> : Le Soutien idéntifié par son id. Null s'il n'existe pas.
+        */
         Soutien res = null;
         try{   
             JpaUtil.creerContextePersistance();
-
-            res = sDao.findById(id);
-        }
-        catch(Exception e){
+            res = sDao.findById(id); // recherche du soutien par id
+        }catch(Exception e){
             System.err.println(e);
         }finally{
             JpaUtil.fermerContextePersistance();
@@ -181,12 +205,14 @@ public class Service {
     }
     
     public List<Soutien> obtenirSoutiens(){
+        /**
+        * Renvoie la liste de tous les soutiens réalisés sur INSTRUCT'IF.
+        * @return(List<Soutien>) <soutiens> : Une ArrayList des Soutien sauvegardés sur la base de données. Null si aucun existe.
+        */
         List<Soutien> soutiens = new ArrayList();
         try{
-            JpaUtil.creerContextePersistance();
-
-            soutiens = sDao.findAll();
-            
+            JpaUtil.creerContextePersistance()
+            soutiens = sDao.findAll(); // obtention de tous les soutiens
         }catch(Exception e){
             System.err.println(e);
         }finally{
@@ -196,6 +222,14 @@ public class Service {
     }
     
     public Statistiques obtenirStatistiques(){
+        /**
+        * Renvoie les statistiques du tableau de bord. L'informations est stockée sous forme d'un objet 
+        * Statistiques(nombreSoutiensRéalisés, nombreElevesSurINSTRUCTIF, nombreIntervenantsSurINSTRUCTIF, EvaluationMoyenneDesSoutiens, meilleurIntervenant, RepartitionGeographique).
+        * Le meilleurIntervenant correspond à l'intervenant avec la meilleur évaluation moyenne de ses interventions.
+        * La RepartitionGeographique
+        * @param(Long) <id> : l'id du Soutien cherché.
+        * @return(Eleve) <res> : Le Soutien idéntifié par son id. Null s'il n'existe pas.
+        */
         Statistiques  stats = new Statistiques();
         try{
             JpaUtil.creerContextePersistance();
