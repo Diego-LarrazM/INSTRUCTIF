@@ -24,7 +24,7 @@ import javax.persistence.TemporalType;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 @Entity
 public class Eleve implements Serializable {
@@ -37,7 +37,7 @@ public class Eleve implements Serializable {
     @Column(nullable = false)
     private String prenom;
     @Column(nullable = false)
-    private Long niveau; // la classe de l'élève 6ème : 6, ... Terminale : 0 
+    private Long niveau; // la classe de l'élève 6ème : 6, ..., Terminale : 0 
     @Temporal(TemporalType.DATE)
     private Date dateDeNaissance;
     @Column(nullable = false, unique = true)
