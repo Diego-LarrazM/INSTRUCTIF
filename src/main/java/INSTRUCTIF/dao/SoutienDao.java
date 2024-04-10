@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 public class SoutienDao {
 
