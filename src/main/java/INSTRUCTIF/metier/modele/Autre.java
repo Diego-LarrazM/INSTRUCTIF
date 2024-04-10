@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 @Entity
 public class Autre extends Intervenant {
