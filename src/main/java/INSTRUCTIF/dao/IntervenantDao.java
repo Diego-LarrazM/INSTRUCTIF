@@ -82,7 +82,7 @@ public class IntervenantDao {
         * Obtient de la base de données toutes les entitées Intervenant disponibles pour répondre à un soutien. Selon un contexte de persistance.
         * Un intervenant est disponible si il n'est pas déjà occupé d'un autre soutien (Intervenant.disponible est vrai).
         * De même il faut que son niveau d'enseignement convient au niveau de la demande de soutien <niveau>: 
-        * Intervenant peut enseigner des classes de niveauMin à niveauMax, il faut que <niveau> ∈ [niveauMin, niveauMax].
+        * Intervenant peut enseigner des classes de niveauMin à niveauMax, il faut que <niveau> ∈ [niveauMin, niveauMax] pour qu'il soit choisi.
         * @param(Long) <niveau> : Le niveau (classe) de l'élève qui démande le soutien.
         * @return(List<Intervenant>) une ArrayList avec tous les intervenants disponibles. Null si aucun existe.
         */
