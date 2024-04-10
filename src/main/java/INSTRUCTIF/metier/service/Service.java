@@ -256,7 +256,7 @@ public class Service {
         * Un intervenant est disponible si il n'est pas déjà occupé d'un autre soutien (Intervenant.disponible est vrai).
         * De même il faut que son niveau d'enseignement convient au niveau de la demande de soutien <niveau>: 
         * Intervenant peut enseigner des classes de niveauMin à niveauMax, il faut que <niveau> ∈ [niveauMin, niveauMax] pour qu'il soit choisi.
-        * @param(Long) <niveau> : Le niveau (classe) de l'élève qui démande le soutien.
+        * @param(Long) <niveau> : Le niveau (classe) de l'élève qui demande le soutien.
         * @precondition(niveau) <niveau> ∈ [0, 6] avec 6: classe de 6ème et 0: classe de Terminale.
         * @return(Intervenant) L'intervenant choisi pour répondre au soutien. Null si aucun disponible.
         */
@@ -266,15 +266,15 @@ public class Service {
 
     public Boolean demanderSoutien(Eleve eleve, Soutien soutien){
         /**
-        * Réalise la démande d'un soutien crée par un élève.
+        * Réalise la demande d'un soutien crée par un élève.
         * La methode met à jour la date de demande du soutien, attribue le soutien à l'élève et tente de l'attribuer à un intervenant.
         * Dans le cas où aucun intervenant soit trouvé celle-ci est considérée comme refusée.
         * Le soutien, l'élève et l'intervenant éventuellement sont mis à jour dans la base de données.
-        * |!|ATTENTION|!| : La démande est réalisée en mode sérialisé pour éviter des concurrences: même intervenant pour deux soutiens par exemple. 
-        * Les démandes sont traitées par ordre d'arrivée : la première demande (celle qui arrive le plus tôt) sera traitée, puis la deuxième.
-        * @param(Eleve) <eleve> : L'élève qui démande le soutien.
-        * @param(Soutien) <soutien> : Le Soutien démandé à traiter.
-        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux. |-|REMARQUE|-| Il n'indique pas si la demande a été refusée ou pas.
+        * |!|ATTENTION|!| : La demande est réalisée en mode sérialisé pour éviter des concurrences: même intervenant pour deux soutiens par exemple. 
+        * Les demandes sont traitées par ordre d'arrivée : la première demande (celle qui arrive le plus tôt) sera traitée, puis la deuxième.
+        * @param(Eleve) <eleve> : L'élève qui demande le soutien.
+        * @param(Soutien) <soutien> : Le Soutien demande à traiter.
+        * @return(Boolean) <res> : Faux si un erreur s'est produite ou si la demande a été refusée. Vrai sinon
         */
         boolean res = false;
         lockSoutien.tryLock(); // Blocakge de la methode pour le traitement en série des deémandes
@@ -288,13 +288,13 @@ public class Service {
             // Persistance du soutien et mise à jour des informations dans la base de données
             sDao.create(soutien);
             eDao.update(eleve);   
-            // Trouver l'intervenant et envoyer le message correspondant ou refuser la démande
-            traiterSoutien(soutien); 
+            // Trouver l'intervenant et envoyer le message correspondant ou refuser la demande
+            res = traiterSoutien(soutien); 
             JpaUtil.validerTransaction();
-            res = true;
         }
         catch(Exception e){
             System.err.println(e);
+            res = false;
         }finally{
             JpaUtil.fermerContextePersistance();
         }
@@ -302,12 +302,14 @@ public class Service {
         return res;
     }
     
-    private void traiterSoutien(Soutien soutien) {
+    private Boolean traiterSoutien(Soutien soutien) {
         /**
         * Trouve un intervenant pour <soutien> et le refuse en cas d'indisponibilité.
         * Un soutien est refusé si sa durée est égale à 0. En attente si sa durée est null (non definie).
-        * @param(Soutien) <soutien> : Un Soutien démandé à traiter.
+        * @param(Soutien) <soutien> : Un Soutien demande à traiter.
+        * @return(Boolean) <res> : Faux si un erreur s'est produite ou si la demande a été refusée. Vrai sinon
         */
+        Boolean res = false;
         try{   
             // Recherche d'un intervenant disponible à qui affecter <soutien>.
             Eleve eleve = soutien.getEleve();
@@ -316,7 +318,7 @@ public class Service {
             if (inter != null) {
                 // Attribuer le soutien à l'intervenant
                 inter.addSoutien(soutien);
-                // L'intervenant a été pris, il est ainsi mis indisponible pour d'autres démandes.
+                // L'intervenant a été pris, il est ainsi mis indisponible pour d'autres demandes.
                 inter.setDisponible(false);
                 // Mise à jour des informations dans la base de données
                 sDao.update(soutien);
@@ -328,19 +330,21 @@ public class Service {
                     +">> demandée à " + dateFormatter.format(soutien.getDateDemande()) + " par " 
                     + eleve.getPrenom() 
                     + " en calsse de " + eleve.getClasse() + ".");
+                res = true;
             } else{
                 soutien.setDuree(new Date(0)); // pas d'intervenant au moment de la demande -> refus du soutien
             }
         }catch(Exception e){
             System.err.println(e);
         }
+        return res;
     }
     
     public boolean demarrerVisio(Soutien soutien) {
         /**
         * Met à jour les informations nécessaires pour le lancement de la visio-conférence.
         * Plus précisement, il met à jour la date de début de la visio-conférence.
-        * @param(Soutien) <soutien> : Un Soutien démandé.
+        * @param(Soutien) <soutien> : Un Soutien demande.
         * @precondition(Soutien) <soutien> n'est pas refusé et est attribué à un intervenant.
         * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
         */
@@ -365,7 +369,7 @@ public class Service {
     public boolean redigerBilan(Soutien soutien, String bilan){
         /**
         * Affecte à soutien <soutien>  le bilan <bilan>  rédigé par l'intervenant qui est intervenu au soutien.
-        * @param(Soutien) <soutien> : Le Soutien démandé.
+        * @param(Soutien) <soutien> : Le Soutien demande.
         * @param(String) <bilan> : Le bilan du soutien <sotuien> pour l'élève, écrit par l'intervenant.
         * @precondition(<soutien>) <soutien> est fini (visio-conférence réalisée) <=> durée > 0.
         * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
@@ -390,7 +394,7 @@ public class Service {
     public boolean affecterUneEvaluation(Soutien soutien, Soutien.Evaluation eval){
         /**
         * Affecte à <soutien> l'évaluation <eval> de l'élève qui a demandé le soutien.
-        * @param(Soutien) <soutien> : Le Soutien démandé.
+        * @param(Soutien) <soutien> : Le Soutien demande.
         * @param(Soutien.Evaluation) <eval> : L'évaluation du soutien par l'élève.
         * @precondition(<soutien>) <soutien> est fini (visio-conférence réalisée) <=> durée > 0.
         * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur.
@@ -416,7 +420,7 @@ public class Service {
     public boolean arreterVisio(Soutien soutien) {
         /**
         * Affecte la durée du soutien à <soutien> et remet l'intervenant qui l'a réalisé comme disponible.
-        * @param(Soutien) <soutien> : Un Soutien démandé.
+        * @param(Soutien) <soutien> : Un Soutien demande.
         * @precondition(Soutien) <soutien> n'est pas refusé et est attribué à un intervenant.
         * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
         */
@@ -425,7 +429,7 @@ public class Service {
             System.out.println("[LOG] Arrêt de la visio-conference");
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-            
+            // Affecte la durée du soutien ( date actuelle - date de debut de la visio)
             soutien.setDuree(new Date(new Date().getTime() - soutien.getDateDebut().getTime()));
             soutien.getIntervenant().setDisponible(true);
             iDao.update(soutien.getIntervenant());
@@ -441,24 +445,31 @@ public class Service {
         return res;
     }
     
-    private Boolean inscrireEtablissement(Etablissement ets) {
-        boolean res = false;
+    private void inscrireEtablissement(Etablissement ets) {
+        /**
+        * Inscrit dans la base de données l'établissement <ets>
+        * @param(Etablissement) <ets> : Un établissement à inscrire.
+        * @precondition(<ets>) Au moins un élève d'INSTRUCT'IF appartient à cet établissement.
+        */
+        // Obtention des coordonnées avec GeoNetApi et affectation à <ets>
         String adresseEtablissement = ets.getNomEts() + ", " + ets.getNomCommune();
         LatLng coordsEtablissement = GeoNetApi.getLatLng(adresseEtablissement);
         ets.setLat(coordsEtablissement.lat);
         ets.setLng(coordsEtablissement.lng);
-
+        // création de <ets> dans la base de données.
         etsDao.create(ets);
-
-        return res;
     }
 
     public boolean insererIntervenants() {
+        /**
+        * Inscrit les intervenants hardcodés d'INSTRUCT'IF.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
+        */
         boolean res = false;
         try{   
             JpaUtil.creerContextePersistance();
             JpaUtil.ouvrirTransaction();
-
+            // Inscription des intervenants.
             iDao.create(new Etudiant("Martin", "Camille", "Sorbonne", "Langues orientales", "camille.martin@sorbonne.fr", "0655447788", "lapinou", 6, 3));
             iDao.create(new Enseignant("Zola", "Anna", "Supérieur", "anna.zola@sup.fr", "6033221144", "monmignon", 6, 0));
             iDao.create(new Enseignant("Hugo", "Emile", "College", "emile.hugo@sup.fr", "0788559944", "motdepasse", 3, 3));
@@ -562,7 +573,6 @@ public class Service {
         List<Eleve> res = null;
         try{
             JpaUtil.creerContextePersistance();
-            
             res = eDao.findAllAsc();
         }
         catch(Exception e){
@@ -575,6 +585,10 @@ public class Service {
     }
     
     public boolean insererMatieres() {
+        /**
+        * Inscrit les matières hardcodés possibles pour demander un soutien sur INSTRUCT'IF.
+        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
+        */
         boolean res = false;
         try{
             JpaUtil.creerContextePersistance();
