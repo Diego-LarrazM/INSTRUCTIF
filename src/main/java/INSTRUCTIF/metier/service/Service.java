@@ -41,6 +41,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Service {
     
     public Eleve obtenirEleveParId(Long id ) {
+        /**
+        * Renvoie l'élève identifié par <id>.
+        * @param(Long) <id> : l'id de l'Eleve cherché.
+        * @return(Eleve) <res> : L'Elève idéntifié par son id. Null s'il n'existe pas.
+        */
         Eleve res = null;
         try{   
             JpaUtil.creerContextePersistance();
