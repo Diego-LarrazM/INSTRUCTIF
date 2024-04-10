@@ -12,7 +12,7 @@ import javax.persistence.TypedQuery;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 public class EtablissementDao {
     public void create(Etablissement etablissement){
