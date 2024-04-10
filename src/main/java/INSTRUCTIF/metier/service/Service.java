@@ -40,7 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Service {
     
-    public Eleve obtenirEleveParId(Long id ) {
+    public Eleve obtenirEleveParId(Long id) {
         /**
         * Renvoie l'élève identifié par <id>.
         * @param(Long) <id> : l'id de l'Eleve cherché.
@@ -75,7 +75,7 @@ public class Service {
         return eleves;
     }
     
-    public Etablissement obtenirEtablissementParId(Long id ){
+    public Etablissement obtenirEtablissementParId(Long id){
         /**
         * Renvoie l'établissemenet identifié par <id>.
         * @param(Long) <id> : l'id de l'Etablissement cherché.
@@ -111,7 +111,7 @@ public class Service {
         return etablissements;
     }
     
-    public Intervenant obtenirIntervenantParId(Long id ) {
+    public Intervenant obtenirIntervenantParId(Long id) {
         /**
         * Renvoie l'intervenant identifié par <id>.
         * @param(Long) <id> : l'id de l'Intervenant cherché.
@@ -149,11 +149,11 @@ public class Service {
         return intervenants;
     }
     
-    public Matiere obtenirMatiereParId(Long id ) {
+    public Matiere obtenirMatiereParId(Long id) {
         /**
         * Renvoie la matière identifiée par <id>.
         * @param(Long) <id> : l'id de la Matiere cherchée.
-        * @return(Eleve) <res> : La Matiere idéntifiée par son id. Null si elle n'existe pas.
+        * @return(Matiere) <res> : La Matiere idéntifiée par son id. Null si elle n'existe pas.
         */
         Matiere res = null;
         try{   
@@ -186,11 +186,11 @@ public class Service {
         return matieres;
     }
     
-    public Soutien obtenirSoutienParId(Long id ) {
+    public Soutien obtenirSoutienParId(Long id) {
         /**
         * Renvoie le soutien identifié par <id>.
         * @param(Long) <id> : l'id du Soutien cherché.
-        * @return(Eleve) <res> : Le Soutien idéntifié par son id. Null s'il n'existe pas.
+        * @return(Soutien) <res> : Le Soutien idéntifié par son id. Null s'il n'existe pas.
         */
         Soutien res = null;
         try{   
@@ -226,23 +226,23 @@ public class Service {
         * Renvoie les statistiques du tableau de bord. L'informations est stockée sous forme d'un objet 
         * Statistiques(nombreSoutiensRéalisés, nombreElevesSurINSTRUCTIF, nombreIntervenantsSurINSTRUCTIF, EvaluationMoyenneDesSoutiens, meilleurIntervenant, RepartitionGeographique).
         * Le meilleurIntervenant correspond à l'intervenant avec la meilleur évaluation moyenne de ses interventions.
-        * La RepartitionGeographique
-        * @param(Long) <id> : l'id du Soutien cherché.
-        * @return(Eleve) <res> : Le Soutien idéntifié par son id. Null s'il n'existe pas.
+        * La RepartitionGeographique correspond à l'id, coordonnées (lat,lng) et nombre d'élèves dans INSTRUCT'IF de chaque établissement de la base de données. 
+        * Les informations de chaque établissement sont stockées sous forme d'un objet EtabHitInstance(idEtablissement, lat, lng, nbElevesInstructifAssociés).
+        * Liste ordonnée par nombre d'élèves pour un établissement.
+        * @return(Statistiques) <stats> : Les statistiquesà afficher sur la fenêtre du tableau de bord. Null si un erreur s'est produit lors de l'obtention d'une statistique.
         */
         Statistiques  stats = new Statistiques();
         try{
             JpaUtil.creerContextePersistance();
-            
+            // Obtention des statistiques une par une.
             stats.setNbSoutiens(sDao.getTotalNumber());
             stats.setNbIntervenant(iDao.getTotalNumber());
             stats.setNbEleves(eDao.getTotalNumber());
             stats.setEvalMoyenne(sDao.getMeanEvaluation());
             stats.setMeillerInter(iDao.getMVI());
             stats.setRepartitionGeo(etsDao.getHitList());
-
         }catch(Exception e){
-            stats = null;
+            stats = null; 
             System.err.println(e);
         }finally{
             JpaUtil.fermerContextePersistance();
@@ -251,11 +251,29 @@ public class Service {
     }
     
     private Intervenant trouverIntervenant(Long niveau) {
+        /**
+        * Choisi un intervenant parmis les disponibles, pour répondre à un soutien réalisé par un élève en classe <niveau> (6e à Terminale).
+        * Un intervenant est disponible si il n'est pas déjà occupé d'un autre soutien (Intervenant.disponible est vrai).
+        * De même il faut que son niveau d'enseignement convient au niveau de la demande de soutien <niveau>: 
+        * Intervenant peut enseigner des classes de niveauMin à niveauMax, il faut que <niveau> ∈ [niveauMin, niveauMax] pour qu'il soit choisi.
+        * @param(Long) <niveau> : Le niveau (classe) de l'élève qui démande le soutien.
+        * @return(Intervenant) L'intervenant choisi pour répondre au soutien. Null si aucun disponible.
+        */
         List<Intervenant> choices = iDao.findAvailableOrdered(niveau);
         return choices.isEmpty() ? null : choices.get(0);
     }
 
     public Boolean demanderSoutien(Eleve eleve, Soutien soutien){
+        /**
+        * Réalise la demande d'un soutien crée par un élève.
+        * La methode met à jour la date de demande du soutien, attribue le soutien à l'élève et tente de l'attribuer à un intervenant.
+        * Dans le cas où aucun intervenant soit trouvé celle-ci est considérée comme refusée.
+        * Le soutien, l'élève et l'intervenant éventuellement sont mis à jour dans la base de données.
+        * /!/ATTENTION/!/ : La démande est réalisée en mode sérialisé pour éviter des concurrences: même intervenant pour deux soutiens par exemple. 
+        * Le démandes sont traitées par ordre d'arrivée : la première demande (celle qui arrive le plus tôt) sera traitée, puis la deuxième.
+        * @param(Long) <niveau> : Le niveau (classe) de l'élève qui démande le soutien.
+        * @return(Intervenant) L'intervenant choisi pour répondre au soutien. Null si aucun disponible.
+        */
         lockSoutien.tryLock();
         boolean res = false;
         try{   
