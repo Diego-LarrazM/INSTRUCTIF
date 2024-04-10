@@ -56,7 +56,7 @@ public class Soutien implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date dateDebut; // la date du début de la visio-conférence
     @Temporal(TemporalType.TIME)
-    private Date duree;
+    private Date duree; // Un soutien est refusé si sa durée est égale à 0. En attente si sa durée est null (non definie).
     @Enumerated(EnumType.ORDINAL)
     private Evaluation evalEleve = Evaluation.PAS_EVALUE;
     private String BilanInter; // le bilan du soutien écrit par l'intervenant
