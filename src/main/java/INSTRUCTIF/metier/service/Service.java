@@ -514,11 +514,14 @@ public class Service {
     
     public Boolean inscrireEleve(Eleve eleve, String uai) {
         /**
-        * Inscrit dans la base de données un un Eleve <eleve> appartenant à un établissement identifié par son <uai>.
-        * @param(Eleve) <eleve> : Un élève à inscrire.
-        * @param(String) <uai> : Le code uai d'un établissement dans l'API EducNET.
-        * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu d’erreur. Sinon Faux.
-        */
+         * Inscrit dans la base de données un un Eleve <eleve> appartenant à un
+         * établissement identifié par son <uai>.
+         * 
+         * @param(Eleve) <eleve> : Un élève à inscrire.
+         * @param(String) <uai> : Le code uai d'un établissement dans l'API EducNET (https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/).
+         * @return(Boolean) <res> : Indicateur de succès. Vrai si il n’y a pas eu
+         *                  d’erreur. Sinon Faux.
+         */
         boolean res = false;
         try{
             JpaUtil.creerContextePersistance();
