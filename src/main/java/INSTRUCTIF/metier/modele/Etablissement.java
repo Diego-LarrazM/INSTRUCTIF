@@ -13,7 +13,7 @@ import javax.persistence.Id;
 
 /**
  *
- * @author dlarrazmar
+ * @author Diego Larraz M et Corentin J
  */
 @Entity
 public class Etablissement {
